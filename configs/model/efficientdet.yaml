@@ -1,0 +1,23 @@
+_target_: src.models.efficientdet_module.EfficientDetModel
+num_classes: 1
+img_size: 512
+prediction_confidence_threshold: 0.2
+learning_rate: 0.0002
+wbf_iou_threshold: 0.44
+inference_transforms: 
+  _target_: src.datamodules.components.utils.get_valid_transforms
+  target_img_size: 512
+model_architecture: "tf_efficientnetv2_l"
+
+# EfficientDet-Lightning/src/models/efficientdet_module.py
+# class EfficientDetModel(LightningModule):
+#     def __init__(
+#         self,
+#         num_classes=1,
+#         img_size=512,
+#         prediction_confidence_threshold=0.2,
+#         learning_rate=0.0002,
+#         wbf_iou_threshold=0.44,
+#         inference_transforms=get_valid_transforms(target_img_size=512),
+#         model_architecture="tf_efficientnetv2_l",
+#     ):

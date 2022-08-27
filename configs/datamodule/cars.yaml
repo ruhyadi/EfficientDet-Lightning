@@ -1,0 +1,29 @@
+_target_: src.datamodules.cars_datamodule.EfficientDetDataModule
+train_path: ${paths.data_dir}/training_images
+val_path: null
+annot_path: ${paths.data_dir}/train_solution_bounding_boxes.csv
+
+train_transforms:
+  _target_: src.datamodules.components.utils.get_train_transforms
+  target_img_size: 512
+
+valid_transforms:
+  _target_: src.datamodules.components.utils.get_valid_transforms
+  target_img_size: 512
+
+num_workers: 8
+batch_size: 8
+
+# EfficientDet-Lightning/src/datamodules/cars_datamodule.py
+# EfficientDet-Lightning/src/datamodules/components/utils.py
+# class EfficientDetDataModule(LightningDataModule):
+#     def __init__(
+#         self,
+#         train_path=None,
+#         val_path=None,
+#         annot_path=None,
+#         train_transforms=get_train_transforms(target_img_size=512),
+#         valid_transforms=get_valid_transforms(target_img_size=512),
+#         num_workers=4,
+#         batch_size=8,
+#     ):

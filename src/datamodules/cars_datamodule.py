@@ -8,7 +8,7 @@ from torch.utils.data import DataLoader
 import torch
 import pandas as pd
 
-from components.utils import (
+from src.datamodules.components.utils import (
     get_train_transforms,
     get_valid_transforms,
     EfficientDetDataset,

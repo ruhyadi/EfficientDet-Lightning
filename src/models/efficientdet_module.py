@@ -8,10 +8,9 @@ import torch
 
 from fastcore.dispatch import typedispatch
 from pytorch_lightning import LightningModule
-from pytorch_lightning.core.decorators import auto_move_data
 
 from ensemble_boxes import ensemble_boxes_wbf
-from components.utils import create_model
+from src.models.components.utils import create_model
 from src.datamodules.components.utils import get_valid_transforms
 
 
@@ -62,7 +61,6 @@ class EfficientDetModel(LightningModule):
         self.wbf_iou_threshold = wbf_iou_threshold
         self.inference_tfms = inference_transforms
 
-    @auto_move_data
     def forward(self, images, targets):
         return self.model(images, targets)
 
@@ -281,3 +279,15 @@ class EfficientDetModel(LightningModule):
                 scaled_bboxes.append(bboxes)
 
         return scaled_bboxes
+
+
+if __name__ == "__main__":
+    # Example of use
+
+    model = EfficientDetModel(
+        num_classes=1,
+        img_size=512,
+        model_architecture="tf_efficientnetv2_l",
+    )
+
+    print(model)
