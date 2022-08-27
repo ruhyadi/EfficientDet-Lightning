@@ -3,16 +3,16 @@ Cars dataset module
 dataset: https://www.kaggle.com/sshikamaru/car-object-detection
 """
 
+import pandas as pd
+import torch
 from pytorch_lightning import LightningDataModule
 from torch.utils.data import DataLoader
-import torch
-import pandas as pd
 
 from src.datamodules.components.utils import (
+    CarsDatasetAdaptor,
+    EfficientDetDataset,
     get_train_transforms,
     get_valid_transforms,
-    EfficientDetDataset,
-    CarsDatasetAdaptor,
 )
 
 
@@ -48,9 +48,7 @@ class EfficientDetDataModule(LightningDataModule):
         )
 
     def train_dataset(self) -> EfficientDetDataset:
-        return EfficientDetDataset(
-            dataset_adaptor=self.train_ds, transforms=self.train_tfms
-        )
+        return EfficientDetDataset(dataset_adaptor=self.train_ds, transforms=self.train_tfms)
 
     def train_dataloader(self) -> DataLoader:
         train_dataset = self.train_dataset()
@@ -67,9 +65,7 @@ class EfficientDetDataModule(LightningDataModule):
         return train_loader
 
     def val_dataset(self) -> EfficientDetDataset:
-        return EfficientDetDataset(
-            dataset_adaptor=self.valid_ds, transforms=self.valid_tfms
-        )
+        return EfficientDetDataset(dataset_adaptor=self.valid_ds, transforms=self.valid_tfms)
 
     def val_dataloader(self) -> DataLoader:
         valid_dataset = self.val_dataset()
@@ -109,7 +105,7 @@ class EfficientDetDataModule(LightningDataModule):
 if __name__ == "__main__":
     # Example os use
 
-    train_path = ("/raid/didir/Repository/EfficientDet-Lightning/data/dataset/training_images")
+    train_path = "/raid/didir/Repository/EfficientDet-Lightning/data/dataset/training_images"
     annot_path = "/raid/didir/Repository/EfficientDet-Lightning/data/dataset/train_solution_bounding_boxes.csv"
 
     dataset = EfficientDetDataModule(

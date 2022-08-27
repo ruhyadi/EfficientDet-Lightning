@@ -1,18 +1,15 @@
-"""
-Dataset utils
-"""
+"""Dataset utils."""
 
 from pathlib import Path
-import PIL
-import numpy as np
-import matplotlib.pyplot as plt
-from matplotlib import patches
-
-from torch.utils.data import Dataset
-import torch
 
 import albumentations as A
+import matplotlib.pyplot as plt
+import numpy as np
+import PIL
+import torch
 from albumentations.pytorch.transforms import ToTensorV2
+from matplotlib import patches
+from torch.utils.data import Dataset
 
 
 def get_rectangle_edges_from_pascal_bbox(bbox):
@@ -55,9 +52,7 @@ def draw_pascal_voc_bboxes(
         plot_ax.add_patch(rect_2)
 
 
-def show_image(
-    image, bboxes=None, draw_bboxes_fn=draw_pascal_voc_bboxes, figsize=(10, 10)
-):
+def show_image(image, bboxes=None, draw_bboxes_fn=draw_pascal_voc_bboxes, figsize=(10, 10)):
     fig, ax = plt.subplots(1, figsize=figsize)
     ax.imshow(image)
 
@@ -148,9 +143,7 @@ class EfficientDetDataset(Dataset):
         labels = sample["labels"]
 
         _, new_h, new_w = image.shape
-        sample["bboxes"][:, [0, 1, 2, 3]] = sample["bboxes"][
-            :, [1, 0, 3, 2]
-        ]  # convert to yxyx
+        sample["bboxes"][:, [0, 1, 2, 3]] = sample["bboxes"][:, [1, 0, 3, 2]]  # convert to yxyx
 
         target = {
             "bboxes": torch.as_tensor(sample["bboxes"], dtype=torch.float32),

@@ -1,17 +1,15 @@
-"""
-EfficientDet Module
-"""
+"""EfficientDet Module."""
 
 from typing import List
+
 import numpy as np
 import torch
-
+from ensemble_boxes import ensemble_boxes_wbf
 from fastcore.dispatch import typedispatch
 from pytorch_lightning import LightningModule
 
-from ensemble_boxes import ensemble_boxes_wbf
-from src.models.components.utils import create_model
 from src.datamodules.components.utils import get_valid_transforms
+from src.models.components.utils import create_model
 
 
 def run_wbf(predictions, image_size=512, iou_thr=0.44, skip_box_thr=0.43, weights=None):
@@ -53,9 +51,7 @@ class EfficientDetModel(LightningModule):
     ):
         super().__init__()
         self.img_size = img_size
-        self.model = create_model(
-            num_classes, img_size, architecture=model_architecture
-        )
+        self.model = create_model(num_classes, img_size, architecture=model_architecture)
         self.prediction_confidence_threshold = prediction_confidence_threshold
         self.lr = learning_rate
         self.wbf_iou_threshold = wbf_iou_threshold
@@ -188,10 +184,7 @@ class EfficientDetModel(LightningModule):
         """
         if images_tensor.ndim == 3:
             images_tensor = images_tensor.unsqueeze(0)
-        if (
-            images_tensor.shape[-1] != self.img_size
-            or images_tensor.shape[-2] != self.img_size
-        ):
+        if images_tensor.shape[-1] != self.img_size or images_tensor.shape[-2] != self.img_size:
             raise ValueError(
                 f"Input tensors must be of shape (N, 3, {self.img_size}, {self.img_size})"
             )
@@ -202,13 +195,9 @@ class EfficientDetModel(LightningModule):
         return self._run_inference(images_tensor, image_sizes)
 
     def _run_inference(self, images_tensor, image_sizes):
-        dummy_targets = self._create_dummy_inference_targets(
-            num_images=images_tensor.shape[0]
-        )
+        dummy_targets = self._create_dummy_inference_targets(num_images=images_tensor.shape[0])
 
-        detections = self.model(images_tensor.to(self.device), dummy_targets)[
-            "detections"
-        ]
+        detections = self.model(images_tensor.to(self.device), dummy_targets)["detections"]
         (
             predicted_bboxes,
             predicted_class_confidences,
@@ -224,8 +213,7 @@ class EfficientDetModel(LightningModule):
     def _create_dummy_inference_targets(self, num_images):
         dummy_targets = {
             "bbox": [
-                torch.tensor([[0.0, 0.0, 0.0, 0.0]], device=self.device)
-                for i in range(num_images)
+                torch.tensor([[0.0, 0.0, 0.0, 0.0]], device=self.device) for i in range(num_images)
             ],
             "cls": [torch.tensor([1.0], device=self.device) for i in range(num_images)],
             "img_size": torch.tensor(
@@ -239,9 +227,7 @@ class EfficientDetModel(LightningModule):
     def post_process_detections(self, detections):
         predictions = []
         for i in range(detections.shape[0]):
-            predictions.append(
-                self._postprocess_single_prediction_detections(detections[i])
-            )
+            predictions.append(self._postprocess_single_prediction_detections(detections[i]))
 
         predicted_bboxes, predicted_class_confidences, predicted_class_labels = run_wbf(
             predictions, image_size=self.img_size, iou_thr=self.wbf_iou_threshold
