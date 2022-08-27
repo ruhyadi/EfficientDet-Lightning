@@ -6,32 +6,46 @@ dataset: https://www.kaggle.com/sshikamaru/car-object-detection
 from pytorch_lightning import LightningDataModule
 from torch.utils.data import DataLoader
 import torch
+import pandas as pd
 
 from components.utils import (
     get_train_transforms,
     get_valid_transforms,
     EfficientDetDataset,
+    CarsDatasetAdaptor,
 )
 
 
 class EfficientDetDataModule(LightningDataModule):
     def __init__(
         self,
-        train_dataset_adaptor,
-        validation_dataset_adaptor,
+        train_path=None,
+        val_path=None,
+        annot_path=None,
         train_transforms=get_train_transforms(target_img_size=512),
         valid_transforms=get_valid_transforms(target_img_size=512),
         num_workers=4,
         batch_size=8,
     ):
+        super().__init__()
 
-        self.train_ds = train_dataset_adaptor
-        self.valid_ds = validation_dataset_adaptor
+        self.train_path = train_path
+        self.val_path = val_path if val_path is not None else train_path
+        self.annot_path = annot_path
         self.train_tfms = train_transforms
         self.valid_tfms = valid_transforms
         self.num_workers = num_workers
         self.batch_size = batch_size
-        super().__init__()
+
+        self.ds = pd.read_csv(self.annot_path)
+        self.train_ds = CarsDatasetAdaptor(
+            images_dir_path=self.train_path,
+            annotations_dataframe=self.ds,
+        )
+        self.valid_ds = CarsDatasetAdaptor(
+            images_dir_path=self.val_path,
+            annotations_dataframe=self.ds,
+        )
 
     def train_dataset(self) -> EfficientDetDataset:
         return EfficientDetDataset(
@@ -90,3 +104,24 @@ class EfficientDetDataModule(LightningDataModule):
         }
 
         return images, annotations, targets, image_ids
+
+
+if __name__ == "__main__":
+    # Example os use
+
+    train_path = ("/raid/didir/Repository/EfficientDet-Lightning/data/dataset/training_images")
+    annot_path = "/raid/didir/Repository/EfficientDet-Lightning/data/dataset/train_solution_bounding_boxes.csv"
+
+    dataset = EfficientDetDataModule(
+        train_path=train_path,
+        annot_path=annot_path,
+        train_transforms=get_train_transforms(target_img_size=512),
+        valid_transforms=get_valid_transforms(target_img_size=512),
+        num_workers=4,
+        batch_size=1,
+    )
+
+    train_loader = dataset.train_dataloader()
+    for images, annotations, targets, image_ids in train_loader:
+        print(annotations)
+        break
