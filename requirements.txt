@@ -1,7 +1,7 @@
 # --------- pytorch --------- #
 torch==1.8.1
 torchvision==0.9.1
-pytorch-lightning==1.6.5 # torch>=1.8.0
+pytorch-lightning==1.8.5 # torch>=1.8.0
 torchmetrics
 
 # additional
